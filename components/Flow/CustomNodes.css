@@ -1,0 +1,21 @@
+/* styles/CustomNodes.css */
+
+.custom-node.start-node:hover,
+.custom-node.webhook-node:hover,
+.custom-node.simulate-node:hover {
+  border-color: #ff5722;  /* Change border color on hover */
+  box-shadow: 0px 3px 6px rgba(255, 87, 34, 0.5); /* Change box shadow on hover */
+}
+/* styles/CustomNodes.css */
+
+/* styles/CustomNodes.css */
+
+@keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+  
