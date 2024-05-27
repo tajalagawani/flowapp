@@ -1,4 +1,4 @@
-// components/Flow/AnnotationNode.tsx
+"use client";
 import React, { memo, useState, CSSProperties } from 'react';
 import { NodeToolbar } from 'reactflow';
 import { Tooltip, Textarea } from '@nextui-org/react';

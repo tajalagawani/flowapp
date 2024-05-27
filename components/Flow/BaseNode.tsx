@@ -1,9 +1,10 @@
-// components/Flow/BaseNode.tsx
+"use client";
 import React, { memo, FC, CSSProperties, useState } from 'react';
 import { Handle, Position, NodeProps, NodeToolbar } from 'reactflow';
-import { Tooltip, Input } from '@nextui-org/react';
 import { Icon } from '@iconify/react';
+import { Button, Tooltip } from '@nextui-org/react';
 import DraggablePanels from './panelsModal'; // Adjust the import path as needed
+import NodeSettings from '../settings-layout/NodeSettings'; // Adjust the import path as needed
 
 const handleStyle: CSSProperties = {
   width: 10,
@@ -31,6 +32,19 @@ const selectedNodeStyle: CSSProperties = {
   border: '2px solid #ff5722',
 };
 
+const headerStyle: CSSProperties = {
+  fontSize: '12px',
+  color: '#4d4d4d',
+  marginTop: '5px',
+};
+
+const labelStyle: CSSProperties = {
+  position: 'absolute',
+  color: '#555',
+  bottom: -15,
+  fontSize: 8,
+};
+
 const toolbarStyle: CSSProperties = {
   display: 'flex',
   gap: '5px',
@@ -43,6 +57,7 @@ const toolbarStyle: CSSProperties = {
 };
 
 const buttonStyle: CSSProperties = {
+  width: '100%',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -57,7 +72,7 @@ const logBarStyle: CSSProperties = {
   backgroundColor: 'black',
   color: 'white',
   padding: '2px 5px',
-  borderRadius: '5px',
+  borderRadius: '10px',
   overflow: 'hidden',
   display: 'flex',
   alignItems: 'center',
@@ -75,7 +90,7 @@ const marqueeContainerStyle: CSSProperties = {
 const marqueeStyle: CSSProperties = {
   display: 'inline-block',
   whiteSpace: 'nowrap',
-  animation: 'marquee 3s linear infinite',
+  animation: 'marquee 7s linear infinite',
   fontSize: '8px',
 };
 
@@ -94,130 +109,104 @@ const actionButtonStyle: CSSProperties = {
   border: 'none',
   cursor: 'pointer',
   padding: '0 5px',
-  fontSize: '14px',
+  fontSize: '10px',
+  color: 'gray',
 };
 
 interface BaseNodeProps extends NodeProps {
   icon: JSX.Element;
   nodeType: string;
-  children?: React.ReactNode;
+  customSettings?: JSX.Element; // Add customSettings prop
 }
 
-const BaseNode: FC<BaseNodeProps> = ({ data, icon, nodeType, selected, children }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [label, setLabel] = useState(data.label);
-  const [textColor, setTextColor] = useState('#000');
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+const BaseNode: FC<BaseNodeProps> = ({ data, icon, nodeType, selected, customSettings }) => {
+  const [isModalOpen, setModalOpen] = useState(false);
 
-  const handleLabelChange = (e) => {
-    setLabel(e.target.value);
+  const handleDoubleClick = () => {
+    setModalOpen(true);
   };
 
-  const handleTextColorChange = (e) => {
-    setTextColor(e.target.value);
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(label);
-    alert('Label copied to clipboard!');
-  };
-
-  const toggleEditing = () => {
-    setIsEditing(!isEditing);
-  };
-
-  const openSettings = () => {
-    setIsSettingsOpen(true);
-  };
-
-  const closeSettings = () => {
-    setIsSettingsOpen(false);
+  const handleCloseModal = () => {
+    setModalOpen(false);
   };
 
   return (
     <>
       <div
         className={`custom-node ${nodeType}`}
-        style={{
-          ...nodeStyle,
-          ...(selected ? selectedNodeStyle : { border: '2px solid #4d4d4d' }),
-        }}
-        onDoubleClick={openSettings}
+        style={{ ...nodeStyle, ...(selected ? selectedNodeStyle : { border: '2px solid #4d4d4d' }) }}
+        onDoubleClick={handleDoubleClick}
       >
         {selected && (
-          <NodeToolbar isVisible={selected} style={toolbarStyle}>
-            <Tooltip content="Edit Text" placement="top">
-              <button style={buttonStyle} onClick={toggleEditing}>
-                <Icon icon="mdi:pencil" />
-              </button>
-            </Tooltip>
-            <Tooltip content="Copy Text" placement="top">
-              <button style={buttonStyle} onClick={handleCopy}>
-                <Icon icon="mdi:content-copy" />
-              </button>
-            </Tooltip>
-            <Tooltip content="Change Text Color" placement="top">
-              <input
-                type="color"
-                value={textColor}
-                onChange={handleTextColorChange}
-                aria-label="Change text color"
-              />
-            </Tooltip>
-          </NodeToolbar>
+          <>
+            <NodeToolbar isVisible={selected} style={toolbarStyle}>
+              <Tooltip content="Stop" placement="top">
+                <button style={buttonStyle}>
+                  <Icon icon="mdi:stop" />
+                </button>
+              </Tooltip>
+              <Tooltip content="Pause" placement="top">
+                <button style={buttonStyle}>
+                  <Icon icon="mdi:pause" />
+                </button>
+              </Tooltip>
+              <Tooltip content="Refresh" placement="top">
+                <button style={buttonStyle}>
+                  <Icon icon="mdi:refresh" />
+                </button>
+              </Tooltip>
+            </NodeToolbar>
+            <div style={logBarStyle}>
+              <span style={greenDotStyle}></span>
+              <div style={marqueeContainerStyle}>
+                <div style={marqueeStyle}>
+                  Here the log of the node is displayed in a scrolling manner
+                </div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', position: 'absolute', bottom: '5px', padding: '0 10px' }}>
+              <Tooltip content="Edit" placement="top">
+                <button style={actionButtonStyle}>
+                  <Icon icon="mdi:pencil" />
+                </button>
+              </Tooltip>
+              <Tooltip content="Delete" placement="top">
+                <button style={actionButtonStyle}>
+                  <Icon icon="mdi:delete" />
+                </button>
+              </Tooltip>
+              <Tooltip content="Duplicate" placement="top">
+                <button style={actionButtonStyle}>
+                  <Icon icon="mdi:content-copy" />
+                </button>
+              </Tooltip>
+            </div>
+          </>
         )}
         <Handle type="target" position={Position.Left} id="left" style={handleStyle} />
         <div style={{ fontSize: '24px' }}>{icon}</div>
-        <div style={{ color: textColor }}>
-          {isEditing ? (
-            <Input
-              fullWidth
-              value={label}
-              onChange={handleLabelChange}
-              onBlur={toggleEditing}
-              aria-label="Edit text"
-              autoFocus
-            />
-          ) : (
-            <div onDoubleClick={toggleEditing}>{label}</div>
-          )}
-        </div>
-        <div style={logBarStyle}>
-          <span style={greenDotStyle}></span>
-          <div style={marqueeContainerStyle}>
-            <div style={marqueeStyle}>
-              Here the log of the node is displayed in a scrolling manner
-            </div>
-          </div>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', position: 'absolute', bottom: '5px', padding: '0 10px' }}>
-          <Tooltip content="Edit" placement="top">
-            <button style={actionButtonStyle}>
-              <Icon icon="mdi:pencil" />
-            </button>
-          </Tooltip>
-          <Tooltip content="Delete" placement="top">
-            <button style={actionButtonStyle}>
-              <Icon icon="mdi:delete" />
-            </button>
-          </Tooltip>
-          <Tooltip content="Duplicate" placement="top">
-            <button style={actionButtonStyle}>
-              <Icon icon="mdi:content-copy" />
-            </button>
-          </Tooltip>
+        <div style={headerStyle}>
+          <strong>{data.label}</strong>
         </div>
         <Handle type="source" position={Position.Right} id="right" style={handleStyle} />
+        <div style={labelStyle}>{data.label}</div>
       </div>
-      {isSettingsOpen && (
+      {isModalOpen && (
         <DraggablePanels
-          isOpen={isSettingsOpen}
-          onClose={closeSettings}
-          nodeName={label}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
           nodeDescription={data.description || "Node Description"}
-        >
-          {children}
-        </DraggablePanels>
+          customSettings={
+            customSettings ? (
+              customSettings
+            ) : (
+              <NodeSettings
+                nodeName={data.label}
+                nodeDescription={data.description || "Node Description"}
+              />
+            )
+          }
+        />
       )}
     </>
   );

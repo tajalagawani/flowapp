@@ -2,11 +2,10 @@
 import React, { useState } from 'react';
 import { Modal, Box, Paper } from '@mui/material';
 import OutputPane from './OutputPane';
-// import Nody from './nody/Nody';
-import NodeSettings from '../settings-layout/NodeSettings'
-import InputPane from './InputPane'
+import InputPane from './InputPane';
+import NodeSettings from '../settings-layout/NodeSettings'; // Ensure this is the correct import path
 
-function DraggablePanels({ isOpen, onClose, nodeName, nodeDescription }: DraggablePanelsProps) {
+function DraggablePanels({ isOpen, onClose, nodeName, nodeDescription, customSettings }) {
   const transitionStyle = {
     transition: 'width 0s ease',
   };
@@ -67,7 +66,7 @@ function DraggablePanels({ isOpen, onClose, nodeName, nodeDescription }: Draggab
           maxWidth: containerWidth,
           height: '95%',
           padding: '4px',
-          backgroundColor: 'rgba(0, 0, 0, 0)', // Fully transparent background
+          backgroundColor: 'rgba(0, 0, 0, 0)',
           borderRadius: '12px',
           overflow: 'hidden',
           '&:focus': {
@@ -83,7 +82,7 @@ function DraggablePanels({ isOpen, onClose, nodeName, nodeDescription }: Draggab
             display: 'flex',
             width: '100%',
             height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0)', // Fully transparent background
+            backgroundColor: 'rgba(0, 0, 0, 0)',
             borderRadius: '12px',
             borderTopLeftRadius: '15px',
             marginTop: 1,
@@ -95,17 +94,16 @@ function DraggablePanels({ isOpen, onClose, nodeName, nodeDescription }: Draggab
           <Paper
             sx={{
               width: sizes.leftWidth,
-              height: '90%', // Adjust height as needed
+              height: '90%',
               overflow: 'auto',
-              backgroundColor: '#f1f3f8', // Fully transparent background
+              backgroundColor: '#f1f3f8',
               marginTop: 5,
               ...transitionStyle,
               borderTopLeftRadius: '15px',
               borderBottomLeftRadius: '15px',
               borderRadius: '12px',
-              zIndex: 0, // Higher z-index to ensure it's above other boxes
+              zIndex: 0,
               boxShadow: '1px 0 20px -20px rgba(0,0,0,0.1), -8px 0 15px -10px rgba(0,0,0,0.6)',
-
             }}
           >
             <InputPane />
@@ -125,7 +123,7 @@ function DraggablePanels({ isOpen, onClose, nodeName, nodeDescription }: Draggab
             }}
             onMouseDown={handleMouseDown}
           >
-            <NodeSettings nodeName={nodeName} nodeDescription={nodeDescription} />
+            {customSettings ? customSettings : <NodeSettings nodeName={nodeName} nodeDescription={nodeDescription} />}
           </Paper>
           <Paper
             sx={{
@@ -133,13 +131,12 @@ function DraggablePanels({ isOpen, onClose, nodeName, nodeDescription }: Draggab
               height: '90%',
               marginTop: 5,
               ...transitionStyle,
-              backgroundColor: '#f1f3f8', // Fully transparent background
+              backgroundColor: '#f1f3f8',
               overflow: 'auto',
               borderTopRightRadius: '15px',
               borderBottomRightRadius: '15px',
               zIndex: 1,
               boxShadow: '1px 0 20px -20px rgba(0,0,0,0.6), -8px 0 15px -10px rgba(0,0,0,0.6)',
-
             }}
           >
             <OutputPane />
@@ -148,6 +145,6 @@ function DraggablePanels({ isOpen, onClose, nodeName, nodeDescription }: Draggab
       </Paper>
     </Modal>
   );
-};
+}
 
 export default DraggablePanels;
